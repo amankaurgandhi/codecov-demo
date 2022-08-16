@@ -5,6 +5,7 @@ provider "aws" {
     key_prefixes = ["AutoTag_"]
   }
 }
+
 terraform {
   backend "s3" {
     encrypt        = "true"
