@@ -40,7 +40,7 @@ jobs:
           echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
 
           curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
-          apt-get install awscli
+          sudo apt-get install awscli
           temp_role=$(aws sts assume-role-with-web-identity \
           --web-identity-token file://$AWS_WEB_IDENTITY_TOKEN_FILE \                       
           --role-arn "arn:aws:iam::573626210569:role/github-webidentity-role-admin" \                    
