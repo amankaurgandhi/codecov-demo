@@ -17,9 +17,6 @@ jobs:
   terraform-plan:
     name: "Terraform Plan"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,80 +30,6 @@ jobs:
           role-session-name: ${{ github.actor }}_${{ github.job }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.1.8
-
-      - name: Check if Terraform backend exists
-        id: check_backend
-        uses: andstor/file-existence-action@v1
-        with:
-          files: "backend.tf"
-
-      - name: Generate Terraform backend
-        if: steps.check_backend.outputs.files_exists == 'false'
-        id: backend
-        run: |
-          cat > backend.tf << EOF
-          provider "aws" {
-            region = "${{ secrets.AWS_REGION }}"
-
-            ignore_tags {
-              key_prefixes = ["AutoTag_"]
-            }
-          }
-
-          terraform {
-            backend "s3" {
-              bucket         = "${{ secrets.AWS_ACCOUNT_ID }}-tf-remote-state"
-              key            = "${{ github.repositoryUrl }}"
-              region         = "${{ secrets.AWS_REGION }}"
-            }
-          }
-          EOF
-          ls
-
-      - name: Commit Backend.tf
-        if: steps.check_backend.outputs.files_exists == 'false'
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Add terraform backend"
-          file_pattern: '*backend.tf'
-
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false -out=terraform.tfplan
-        continue-on-error: true
-
-      - name: Reformat Plan
-        if: steps.plan.outcome == 'success'
-        run: terraform show -no-color terraform.tfplan | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
-        #echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' \
-        #| sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
-
-      # GitHUB PR has 65k character limit: https://github.com/robburger/terraform-pr-commenter/issues/6
-      #    echo "$PLAN" >> $GITHUB_ENV
-      - name: Put Plan in Env Var
-        if: steps.plan.outcome == 'success'
-        run: |
-          PLAN=$(cat plan.txt)
-          echo "PLAN<<EOF" >> $GITHUB_ENV
-          echo "${PLAN:0:65536}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
       - name: Invoke foobarFunction Lambda
         uses: gagoar/invoke-aws-lambda@v3.3.1
         with:
