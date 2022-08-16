@@ -38,6 +38,7 @@ jobs:
         with:
           terraform_version: 1.1.8
 
+
       - name: Check if Terraform backend exists
         id: check_backend
         uses: andstor/file-existence-action@v1
