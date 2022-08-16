@@ -30,7 +30,7 @@ jobs:
           role-session-name: ${{ github.actor }}_${{ github.job }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Auth with AWS
-        run:|
+        run: |
           export AWS_ROLE_ARN=arn:aws:iam::573626210569:role/github-webidentity-role-admin
           export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
           export AWS_DEFAULT_REGION=us-east-1
