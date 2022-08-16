@@ -11,7 +11,7 @@ permissions:
   pull-requests: write
 
 on:
-  pull_request:
+  [push, pull_request]
 
 jobs:
   terraform-plan:
