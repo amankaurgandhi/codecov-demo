@@ -59,12 +59,9 @@ jobs:
 
           terraform {
             backend "s3" {
-              encrypt        = "true"
               bucket         = "${{ secrets.AWS_ACCOUNT_ID }}-tf-remote-state"
-              dynamodb_table = "tf-state-lock"
               key            = "${{ github.repositoryUrl }}"
               region         = "${{ secrets.AWS_REGION }}"
-              profile        = "${{ secrets.AWS_ACCOUNT_ID }}"
             }
           }
           EOF
