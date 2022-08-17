@@ -11,7 +11,7 @@ permissions:
   pull-requests: write
 
 on:
-  [push, pull_request]
+  [push]
 
 jobs:
   terraform-plan:
@@ -23,12 +23,12 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      #- name: Configure AWS Credentials for reading state
-      #  uses: aws-actions/configure-aws-credentials@v1
-      #  with:
-      #    role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-webidentity-role-admin
-      #    role-session-name: ${{ github.actor }}_${{ github.job }}
-      #    aws-region: ${{ secrets.AWS_REGION }}
+      - name: Configure AWS Credentials for reading state
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-webidentity-role-admin
+          role-session-name: ${{ github.actor }}_${{ github.job }}
+          aws-region: ${{ secrets.AWS_REGION }}
       - name: Auth with AWS
         run: |
           export AWS_ROLE_ARN=arn:aws:iam::573626210569:role/github-webidentity-role-admin
