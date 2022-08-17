@@ -30,34 +30,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-webidentity-role-admin
           role-session-name: ${{ github.actor }}_${{ github.job }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Auth with AWS
-        run: |
-          export AWS_ROLE_ARN=arn:aws:iam::573626210569:role/github-webidentity-role-admin
-          export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-          export AWS_DEFAULT_REGION=us-east-1
-
-          echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-          echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
-
-          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
-          sudo apt-get install awscli
-          temp_role=$(aws sts assume-role-with-web-identity --web-identity-token file://$AWS_WEB_IDENTITY_TOKEN_FILE --role-arn "arn:aws:iam::573626210569:role/github-webidentity-role-admin" --role-session-name "githubSession")
-          export AWS_ACCESS_KEY_ID=$(echo $temp_role | jq -r .Credentials.AccessKeyId) >> GITHUB_ENV
-          echo "::add-mask::$AWS_ACCESS_KEY_ID"
-          export AWS_SECRET_ACCESS_KEY=$(echo $temp_role | jq -r .Credentials.SecretAccessKey) >> $GITHUB_ENV
-          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
-          export AWS_SESSION_TOKEN=$(echo $temp_role | jq -r .Credentials.SessionToken) >> $GITHUB_ENV
-          echo "::add-mask::$AWS_SESSION_TOKEN"
+      - run: aws lambda invoke --function-name foobarFunction
+        shell: bash
       
-      - name: Invoke foobarFunction Lambda
-        uses: gagoar/invoke-aws-lambda@v3.3.1
-        with:
-          AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-          AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
-          FunctionName: foobarFunction
-          Payload: '{ "myParameter": false }'
+      
       - uses: actions/github-script@v6
         # env:
         #   ORIG_PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
