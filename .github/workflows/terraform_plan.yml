@@ -48,7 +48,7 @@ jobs:
           echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
           export AWS_SESSION_TOKEN=$(echo $temp_role | jq -r .Credentials.SessionToken) >> $GITHUB_ENV
           echo "::add-mask::$AWS_SESSION_TOKEN"
-          
+       
       - name: Invoke foobarFunction Lambda
         uses: gagoar/invoke-aws-lambda@v3.3.1
         with:
