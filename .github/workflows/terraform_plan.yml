@@ -30,7 +30,7 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-webidentity-role-admin
           role-session-name: ${{ github.actor }}_${{ github.job }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - run: aws lambda invoke --function-name foobarFunction
+      - run: aws lambda invoke --function-name foobarFunction response.json
         shell: bash
       
       
