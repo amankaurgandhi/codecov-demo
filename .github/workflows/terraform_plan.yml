@@ -32,7 +32,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - run: aws lambda invoke --function-name foobarFunction response.json
         shell: bash
-      - run: echo ${{ github.event.payload}}
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
       
       
       - uses: actions/github-script@v6
