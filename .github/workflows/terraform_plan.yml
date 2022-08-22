@@ -32,6 +32,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - run: aws lambda invoke --function-name foobarFunction response.json
         shell: bash
+      - run: echo ${{ github.event.payload}}
       
       
       - uses: actions/github-script@v6
