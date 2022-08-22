@@ -30,13 +30,14 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-webidentity-role-admin
           role-session-name: ${{ github.actor }}_${{ github.job }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - run: aws lambda invoke --function-name foobarFunction response.json
-        shell: bash
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "$GITHUB_CONTEXT"
+      - run: aws lambda invoke --function-name foobarFunction response.json --payload $GITHUB_CONTEXT
+        shell: bash
+      
       
       
       - uses: actions/github-script@v6
