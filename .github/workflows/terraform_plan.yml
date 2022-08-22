@@ -35,7 +35,8 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "$GITHUB_CONTEXT"
-      - run: aws lambda invoke --function-name foobarFunction --cli-binary-format raw-in-base64-out --payload '$GITHUB_CONTEXT' response.json
+          openssl base64 -out encoded_payload -in $GITHUB_CONTEXT
+      - run: aws lambda invoke --function-name foobarFunction --payload file://~/encoded_payload response.json
         shell: bash
       
       
