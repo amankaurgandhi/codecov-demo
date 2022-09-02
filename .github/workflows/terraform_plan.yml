@@ -12,7 +12,7 @@ permissions:
   pull-requests: write
 
 on:
-  pull_request:
+  push:
 
 jobs:
   terraform-plan:
@@ -35,7 +35,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "$GITHUB_CONTEXT"
-      - run: aws stepfunctions start-execution -state-machine-arn arn:aws:states:us-east-1:573626210569:stateMachine:TestGitHUbActions
+      - run: aws stepfunctions start-execution --state-machine-arn arn:aws:states:us-east-1:573626210569:stateMachine:TestGitHUbActions
         shell: bash
       
       
