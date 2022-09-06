@@ -35,10 +35,15 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "$GITHUB_CONTEXT"
-      - run: aws stepfunctions start-execution --state-machine-arn arn:aws:states:us-east-1:573626210569:stateMachine:TestGitHUbActions
+      - name: Start AWS Step function 
+        id: executestepfunctions
+        run: | 
+          echo "::set-output name=executionarn::$(aws stepfunctions start-execution --state-machine-arn arn:aws:states:us-east-1:573626210569:stateMachine:TestGitHUbActionsh | grep -o '"executionArn": *"[^"]*"')"
         shell: bash
-      
-      
+      - name: This is the Execution ARN 
+        run: |
+          echo ${${{ steps.executestepfunctions.outputs.executionarn }}} # this will show execution arn.
+      - run: aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }}
       
       - uses: actions/github-script@v6
         # env:
