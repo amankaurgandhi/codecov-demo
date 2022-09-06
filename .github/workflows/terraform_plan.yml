@@ -38,7 +38,7 @@ jobs:
       - name: Start AWS Step function 
         id: executestepfunctions
         run: | 
-          echo "::set-output name=executionarn::$(aws stepfunctions start-execution --state-machine-arn arn:aws:states:us-east-1:573626210569:stateMachine:TestGitHUbActions | grep -o '"executionArn": *"[^"]*"')"
+          echo "::set-output name=executionarn::$(aws stepfunctions start-execution --state-machine-arn arn:aws:states:us-east-1:573626210569:stateMachine:TestGitHUbActions | grep -o '"executionArn": "[^"]*' |  grep -o '[^"]*$' )"
         shell: bash
       - name: This is the Execution ARN 
         run: |
