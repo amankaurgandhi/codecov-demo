@@ -47,7 +47,7 @@ jobs:
           do
             result = aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }}
           while (result.status not in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]) 
-          
+        shell: bash
       
       - uses: actions/github-script@v6
         # env:
