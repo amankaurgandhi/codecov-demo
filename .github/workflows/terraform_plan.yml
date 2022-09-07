@@ -56,11 +56,11 @@ jobs:
         id: getresult
         run: | 
           RUNWHILE="True"
-          while [ $RUNWHILE -eq "True" ]
+          while [ $RUNWHILE=="True" ]
           do
             RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
             echo "::set-output name=finalresult::$RESULT"
-            if [ $RESULT -eq "RUNNING" ]
+            if [ $RESULT=="RUNNING" ]
             then
               sleep 120
             else
