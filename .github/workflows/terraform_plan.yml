@@ -55,7 +55,7 @@ jobs:
       - name: Loop until it's running
         id: getresult
         run: | 
-          runwhileloop = "True"
+          runwhileloop="True"
           while [ $runwhileloop -eq "True" ]
           do
 	          RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
@@ -67,7 +67,6 @@ jobs:
 		          runwhileloop = "False"
 	          fi
           done
-             
         shell: bash
       - name: This is the final Result 
         run: |
