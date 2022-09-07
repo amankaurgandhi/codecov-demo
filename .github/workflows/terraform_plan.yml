@@ -52,14 +52,20 @@ jobs:
         run: |
           echo ${{ steps.describeexecution.outputs.executionresult}} # this will show execution arn.
         
-      - run: | 
+      - name: Loop until it's running
+        id: getresult
+        run: | 
           while [ "$RESULT" == "RUNNING" ] 
           do 
             RESULT = $(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status' ) 
-            echo $RESULT 
+            echo "::set-output name=finalresult::$RESULT"
           done    
         shell: bash
-      
+      - name: This is the Execution Result 
+        run: |
+          echo ${{ steps.getresult.outputs.finalresult}} # this will result
+        
+
       - uses: actions/github-script@v6
         # env:
         #   ORIG_PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
