@@ -55,25 +55,19 @@ jobs:
       - name: Loop until it's running
         id: getresult
         run: | 
-          RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
-          condition=true
-          if [ $RESULT=="RUNNING" ]
-          then
-            condition=true
-          else
-            condition=false
-          fi
-          while condition; do 
-            RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
-            if [ $RESULT=="RUNNING" ]
-            then
-              condition=true
-            else
-              condition=false
-            fi
-            echo "::set-output name=finalresult::$RESULT"
-            sleep 120
-          done    
+          runwhileloop = "True"
+          while [ $runwhileloop -eq "True" ]
+          do
+	          RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
+	          echo "::set-output name=finalresult::$RESULT"
+	          if [ $RESULT -eq "RUNNING"]
+	          then
+		          sleep 120
+	          else
+		          runwhileloop = "False"
+	          fi
+          done
+             
         shell: bash
       - name: This is the final Result 
         run: |
