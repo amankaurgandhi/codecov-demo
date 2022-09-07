@@ -53,11 +53,11 @@ jobs:
           echo ${{ steps.describeexecution.outputs.executionresult}} # this will show execution arn.
         
       - run: | 
-          result='RUNNING'
-          while [ "$result" == 'RUNNING' ] 
+          RESULT="RUNNING"
+          while [ "$RESULT" == 'RUNNING' ] 
           do 
-          result = $(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status' ) 
-          echo $result 
+          RESULT = $(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status' ) 
+          echo $RESULT 
           done    
         shell: bash
       
