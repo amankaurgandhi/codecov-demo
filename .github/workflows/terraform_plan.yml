@@ -46,14 +46,14 @@ jobs:
       - name: Describe Execution 
         id: describeexecution
         run: | 
-          echo "::set-output name=executionresult::$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} )"
+          echo "::set-output name=executionresult::$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} | grep -o '"status": "[^"]*' |  grep -o '[^"]*$' )"
         shell: bash
       - name: This is the Execution Result 
         run: |
-          echo ${{ fromJSON(steps.describeexecution.outputs.executionresult).status }} # this will show execution arn.
+          echo ${{ steps.describeexecution.outputs.executionresult}} # this will show execution arn.
         
       - run: | 
-          while [$result.status not in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]]; do $result = aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} ; done    
+          while [$result.status not in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]]; do $result = aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} | grep -o '"status": "[^"]*' |  grep -o '[^"]*$'; done    
         shell: bash
       
       - uses: actions/github-script@v6
