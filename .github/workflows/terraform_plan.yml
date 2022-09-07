@@ -58,14 +58,14 @@ jobs:
           RUNWHILE="True"
           while [ $RUNWHILE -eq "True" ]
           do
-	          RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
-	          echo "::set-output name=finalresult::$RESULT"
-	          if [ $RESULT -eq "RUNNING" ]
-	          then
-		          sleep 120
-	          else
-		          RUNWHILE="False"
-	          fi
+            RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
+            echo "::set-output name=finalresult::$RESULT"
+            if [ $RESULT -eq "RUNNING" ]
+            then
+              sleep 120
+            else
+              RUNWHILE="False"
+            fi
           done
         shell: bash
       - name: This is the final Result 
