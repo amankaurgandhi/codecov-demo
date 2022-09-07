@@ -56,10 +56,10 @@ jobs:
         id: getresult
         run: | 
           RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status')"
-          echo "::set-output name=finalresult::$RESULT"
           while [ "$RESULT" == "RUNNING" ]; do 
             RESULT=$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status' ) 
             echo "::set-output name=finalresult::$RESULT"
+            sleep 180
           done    
         shell: bash
       - name: This is the final Result 
