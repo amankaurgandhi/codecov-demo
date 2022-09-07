@@ -59,7 +59,7 @@ jobs:
           while [ $RUNWHILE == "True" ]
           do
             RESULT="$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status' --output text)"
-            echo "::set-output name=finalresult::$RESULT"
+            echo "::set-output name=currentresult::$RESULT"
             if [[ $RESULT == "RUNNING" ]]
             then
               sleep 120
@@ -67,6 +67,7 @@ jobs:
               RUNWHILE="False"
             fi
           done
+          echo "::set-output name=finalresult::$RESULT"
         shell: bash
       - name: This is the final Result 
         run: |
