@@ -42,8 +42,12 @@ jobs:
         shell: bash
       - name: This is the Execution ARN 
         run: |
-          echo ${${{ steps.executestepfunctions.outputs.executionarn }}} # this will show execution arn.
-      #- run: aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }}
+          echo ${{ steps.executestepfunctions.outputs.executionarn }} # this will show execution arn.
+      - run: | 
+          do
+            result = aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }}
+          while (result.status not in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]) 
+          
       
       - uses: actions/github-script@v6
         # env:
