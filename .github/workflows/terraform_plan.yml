@@ -53,7 +53,7 @@ jobs:
           echo ${{ steps.describeexecution.outputs.executionresult}} # this will show execution arn.
         
       - run: | 
-          while [$result =="RUNNING"]; do result = $(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} | grep -o '"status": "[^"]*' |  grep -o '[^"]*$'); done    
+          while [$result =="RUNNING"]; do result = `aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} --query 'status'`; done    
         shell: bash
       
       - uses: actions/github-script@v6
