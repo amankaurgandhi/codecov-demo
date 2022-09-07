@@ -3,7 +3,7 @@ name: "Terraform Plan"
 env:
 
   TF_LOG_PATH: ./terraform.log
-  TF_LOG: INFO #TRACE, DEBUG, INFO, WARN or ERROR
+  TF_LOG: DEBUG #TRACE, DEBUG, INFO, WARN or ERROR
 
 permissions:
   id-token: write
