@@ -43,6 +43,14 @@ jobs:
       - name: This is the Execution ARN 
         run: |
           echo ${{ steps.executestepfunctions.outputs.executionarn }} # this will show execution arn.
+      - name: Describe Execution 
+        id: describeexecution
+        run: | 
+          echo "::set-output name=executionresult::$(aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} )"
+        shell: bash
+      - name: This is the Execution Result 
+        run: |
+          echo ${{ steps.describeexecution.outputs.executionresult }} # this will show execution arn.
       - run: | 
           while [result.status not in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]]; do result = aws stepfunctions describe-execution --execution-arn ${{ steps.executestepfunctions.outputs.executionarn }} ; done    
         shell: bash
