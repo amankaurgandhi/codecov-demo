@@ -3,7 +3,7 @@ name: "Terraform Plan"
 env:
 
   TF_LOG_PATH: ./terraform.log
-  TF_LOG: INFO #TRACE, DEBUG, INFO, WARN or ERROR
+  TF_LOG: DEBUG #TRACE, DEBUG, INFO, WARN or ERROR
 
 permissions:
   id-token: write
@@ -12,7 +12,7 @@ permissions:
   pull-requests: write
 
 on:
-  pull_request:
+  push:
 
 jobs:
   terraform-plan:
@@ -35,38 +35,14 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "$GITHUB_CONTEXT"
-      - run: aws lambda invoke --function-name foobarFunction --cli-binary-format raw-in-base64-out --payload '$GITHUB_CONTEXT' response.json
-        shell: bash
-      
-      
-      
-      - uses: actions/github-script@v6
-        # env:
-        #   ORIG_PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+        
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.39.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INITIAL_VERSION: V1.0.0
+          WITH_V: true
 
-            <details><summary>Show Plan</summary>
-
-            \`\`\`\n
-            ${process.env.PLAN}
-            \`\`\`
-
-            </details>
-
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
 
       - name: Post Plan Sucess to GitHub PR
         if: steps.plan.outcome == 'success'
