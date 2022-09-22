@@ -43,10 +43,7 @@ jobs:
           INITIAL_VERSION: v1.0.0
           WITH_V: true
 
-        
 
-
-        
       - name: Post Plan Sucess to GitHub PR
         if: steps.plan.outcome == 'success'
         uses: mshick/add-pr-comment@v1
