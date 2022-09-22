@@ -36,10 +36,13 @@ jobs:
         run: |
           echo "$GITHUB_CONTEXT"
         
-      - name: version-tag
-        uses: anothrNick/github-tag-action@1.42.0 # another pr require to move this to 1
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.39.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INITIAL_VERSION: v1.0.0
+          WITH_V: true
+
 
       - name: Post Plan Sucess to GitHub PR
         if: steps.plan.outcome == 'success'
