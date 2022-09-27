@@ -1,0 +1,108 @@
+name: "Terraform Plan"
+
+env:
+
+  TF_LOG_PATH: ./terraform.log
+  TF_LOG: DEBUG #TRACE, DEBUG, INFO, WARN or ERROR
+
+permissions:
+  id-token: write
+  contents: write 
+  statuses: write   # This is required for actions/checkout
+  pull-requests: write
+
+on:
+  push:
+
+jobs:
+  terraform-plan:
+    name: "Terraform Plan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Configure AWS Credentials for reading state
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-webidentity-role-admin
+          role-session-name: ${{ github.actor }}_${{ github.job }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+        
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INITIAL_VERSION: V1.0.0
+          WITH_V: true
+
+
+
+      - name: Post Plan Sucess to GitHub PR
+        if: steps.plan.outcome == 'success'
+        uses: mshick/add-pr-comment@v1
+        with:
+          allow-repeats: true
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          message: |
+            ***Terraform Plan Diff***
+            ```diff
+            ${{ env.PLAN }}
+            ```
+
+      - name: Post Plan Failure to GitHub PR
+        if: steps.plan.outcome == 'failure'
+        uses: mshick/add-pr-comment@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          message: |
+            ## 🔴 Terraform Plan Creation Failed
+
+            ```
+            ${{ steps.plan.outputs.stderr }}
+            ```
+
+      # - name: Notify Mirosoft Teams On Success
+      #   if: steps.plan.outcome == 'success'
+      #   uses: jdcargile/ms-teams-notification@v1.3
+      #   with:
+      #     github-token: ${{ github.token }} # this will use the runner's token.
+      #     ms-teams-webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
+      #     notification-summary: Terraform Plan Successfully Created
+      #     notification-color: 34eb5c #Green
+      #     #timezone: America/Denver
+
+      # - name: Notify Mirosoft Teams On Failure
+      #   if: steps.plan.outcome == 'failure'
+      #   uses: jdcargile/ms-teams-notification@v1.3
+      #   with:
+      #     github-token: ${{ github.token }} # this will use the runner's token.
+      #     ms-teams-webhook-uri: ${{ secrets.TEAMS_WEBHOOK }}
+      #     notification-summary: Terraform Plan Creation Failed
+      #     notification-color: eb4034 #Red
+      #     #timezone: America/Denver
+
+      # - name: Tar Files
+      #   run: tar -cvf plan_artifacts.tar .
+      #   # Using tar to overcome GitHub artifacts loosing permissions, which Terraform does not like
+      #   # Reference: https://github.com/actions/upload-artifact/issues/38
+
+      # - name: Save Plan Artifacts
+      #   if: steps.plan.outcome == 'success'
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: plan
+      #     path: plan_artifacts.tar
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
